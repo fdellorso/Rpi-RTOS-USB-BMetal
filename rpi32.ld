@@ -141,10 +141,6 @@ SECTIONS {
 	}
 
 	/**
-	 *	Place HEAP here???
-	 **/
-
-	/**
 	 *	Stack starts at the top of the RAM, and moves down!
 	 **/
 	. = ALIGN(8); 					/* Stack must always be aligned to 8 byte boundary AAPCS32 call standard */
