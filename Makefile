@@ -28,7 +28,7 @@ else
 ifeq ($(OS), Windows_NT)
 ARMGNU := D:/gcc_pi_7_2/bin/arm-none-eabi
 else
-ARMGNU := arm-none-eabi
+ARMGNU := ../gcc-arm-none-eabi-7-3-1/bin/arm-none-eabi
 endif
 SMARTSTART := SmartStart32.S
 SPECIAL_FLAGS := -mno-unaligned-access
@@ -113,21 +113,21 @@ PLATFORM := RaspberryPi
 # In that directory is a Makerules file that specifies what .C and .S files to include
 # They will appear in the C_FILES and S_FILES lists respectively
 # (The loader should always be first entry, ensuring the image starts with it if you want multiple directories.)
-SYSCOMPS := $(TOP_DIR)/loader/$(PLATFORM)
-INCLUDEPATH1 ?=  $(TOP_DIR)/loader/$(PLATFORM)
+SYSCOMPS := $(TOP_DIR)/Loader/$(PLATFORM)
+INCLUDEPATH1 ?=  $(TOP_DIR)/Loader/$(PLATFORM)
 INCLUDEPATH2 ?=  $(TOP_DIR)/FreeRTOS/Source/include
 INCLUDEPATH3 ?=  $(TOP_DIR)/FreeRTOS/Source/portable/GCC/$(PLATFORM)
 
-INCLUDE = -I$(INCLUDEPATH1) -I$(INCLUDEPATH2) -I$(INCLUDEPATH3) -I$(TOP_DIR)/Demo
+INCLUDE = -I$(INCLUDEPATH1) -I$(INCLUDEPATH2) -I$(INCLUDEPATH3) -I$(TOP_DIR)/Main
 
-# Directory which has our demo files to compile
-DEMOCOMPS := $(TOP_DIR)/Demo
+# Directory which has our main files to compile
+MAINCOMPS := $(TOP_DIR)/Main
 
 # Directory that has the FreeRTOS source
 RTOSCOMPS := $(TOP_DIR)/FreeRTOS/Source
 
-# List of all components to include  ... Loader + FreeRTOS + Demo
-COMPS := $(SYSCOMPS) $(RTOSCOMPS) $(DEMOCOMPS)
+# List of all components to include  ... Loader + FreeRTOS + Main
+COMPS := $(SYSCOMPS) $(RTOSCOMPS) $(MAINCOMPS)
 
 # Include component files, each should add its part to the compile source
 # This builds two lists C_FILES and S_FILES from iteration thru the makerules files

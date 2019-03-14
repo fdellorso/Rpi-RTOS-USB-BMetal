@@ -1,5 +1,5 @@
 # Name of this component (the directory this file is stored in)
-COMP = Demo
+COMP = Main
 
 # All .c Source files from this directory
 C_FILES = $(wildcard $(TOP_DIR)/$(COMP)/*.c) \

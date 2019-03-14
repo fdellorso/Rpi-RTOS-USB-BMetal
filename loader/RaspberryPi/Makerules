@@ -1,5 +1,5 @@
 # Name of this component (the directory this file is stored in)
-COMP = loader/RaspberryPi
+COMP = Loader/RaspberryPi
 
 # Source files for this component
 C_FILES = $(wildcard $(TOP_DIR)/$(COMP)/*.c)
