@@ -38,7 +38,7 @@ endif
 INCLUDEPATH ?= FreeRTOS
 
 # Temp directory for object files to go into
-TOP_DIR := .
+TOP_DIR := $(shell pwd)
 BUILD_DIR ?= ${TOP_DIR}/build
 
 # Set the C compilation flags common to all platforms.
@@ -85,6 +85,9 @@ CFLAGS  += -fwrapv
 # ADD any special AARCH compile mode flags
 CFLAGS  += $(SPECIAL_FLAGS)
 
+# Define Flags
+CFLAGS += -DRASPPI=1
+
 Pi3-64: CFLAGS += -ffreestanding -nostartfiles -std=c11 -mcpu=cortex-a53
 Pi3-64: IMGFILE := kernel8.img
 
@@ -117,8 +120,10 @@ SYSCOMPS := $(TOP_DIR)/Loader/$(PLATFORM)
 INCLUDEPATH1 ?=  $(TOP_DIR)/Loader/$(PLATFORM)
 INCLUDEPATH2 ?=  $(TOP_DIR)/FreeRTOS/Source/include
 INCLUDEPATH3 ?=  $(TOP_DIR)/FreeRTOS/Source/portable/GCC/$(PLATFORM)
+INCLUDEPATH4 ?=  $(TOP_DIR)/Uspi/include
+INCLUDEPATH5 ?=  $(TOP_DIR)/Rsta_Bt/include
 
-INCLUDE = -I$(INCLUDEPATH1) -I$(INCLUDEPATH2) -I$(INCLUDEPATH3) -I$(TOP_DIR)/Main
+INCLUDE = -I$(INCLUDEPATH1) -I$(INCLUDEPATH2) -I$(INCLUDEPATH3) -I$(INCLUDEPATH4) -I$(INCLUDEPATH5) -I$(TOP_DIR)/Main
 
 # Directory which has our main files to compile
 MAINCOMPS := $(TOP_DIR)/Main
@@ -126,8 +131,14 @@ MAINCOMPS := $(TOP_DIR)/Main
 # Directory that has the FreeRTOS source
 RTOSCOMPS := $(TOP_DIR)/FreeRTOS/Source
 
-# List of all components to include  ... Loader + FreeRTOS + Main
-COMPS := $(SYSCOMPS) $(RTOSCOMPS) $(MAINCOMPS)
+# Directory that has the USPi source
+USPICOMPS := $(TOP_DIR)/Uspi
+
+# Directory that has the USPi source
+BLTICOMPS := $(TOP_DIR)/Rsta_Bt
+
+# List of all components to include  ... Loader + FreeRTOS + USPi + Main
+COMPS := $(SYSCOMPS) $(RTOSCOMPS) $(USPICOMPS) $(MAINCOMPS)
 
 # Include component files, each should add its part to the compile source
 # This builds two lists C_FILES and S_FILES from iteration thru the makerules files

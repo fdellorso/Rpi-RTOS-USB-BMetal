@@ -1,0 +1,12 @@
+# Name of this component (the directory this file is stored in)
+COMP = Uspi
+
+# All c files in this directory and the platforms sub directory
+C_FILES := $(wildcard $(TOP_DIR)/$(COMP)/lib/*.c) \
+		   $(wildcard $(TOP_DIR)/$(COMP)/uspibind.c)
+
+# All S files in this directory
+S_FILES = $(wildcard $(TOP_DIR)/$(COMP)/lib/*.S)
+
+# Add the files to the compile source path
+COMP_SRC += ${S_FILES} ${C_FILES}

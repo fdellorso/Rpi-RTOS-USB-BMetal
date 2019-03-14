@@ -1019,6 +1019,11 @@ void WriteText (char* lpString);
 HGDIOBJ SelectObject (HDC hdc,										// Handle to the DC (0 means use standard console DC)
 					  HGDIOBJ h);									// Handle to GDI object
 
+/*==========================================================================}
+{								USB ROUTINES								}
+{==========================================================================*/
+
+bool UsbIrqSetup (void);
 
 #ifdef __cplusplus								// If we are including to a C++ file
 }												// Close the extern C directive wrapper

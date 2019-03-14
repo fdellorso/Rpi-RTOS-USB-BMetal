@@ -4,14 +4,18 @@
             "name": "ARM",
             "includePath": [
                 "${workspaceFolder}/Main",
+                "${workspaceFolder}/Loader/RaspberryPi",
+                "${workspaceFolder}/Uspi",
+                "${workspaceFolder}/Rsta_Bt",
                 "${workspaceFolder}/FreeRTOS/Source/include",
-                "${workspaceFolder}/FreeRTOS/Source/portable/GCC/RaspberryPi",
-                "${workspaceFolder}/Loader/RaspberryPi"
+                "${workspaceFolder}/FreeRTOS/Source/portable/GCC/RaspberryPi"
             ],
-            "defines": [],
+            "defines": [
+                "RASPPI=1"
+            ],
             "compilerPath": "${workspaceFolder}/../gcc-arm-none-eabi/bin/arm-none-eabi-gcc",
-            "cStandard": "c99",
-            "cppStandard": "c++17",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
             "intelliSenseMode": "gcc-x64",
             "browse": {
                 "path": [

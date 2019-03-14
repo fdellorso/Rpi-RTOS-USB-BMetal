@@ -304,7 +304,7 @@ typedef union
 	struct __attribute__((__packed__))
 	{
 		unsigned DATA_LENGTH : 1;									// @0	 If clear the UART works in 7-bit mode, If set the UART works in 8-bit mode 
-		unsigned reserved : 5;										// @1-5	 Reserved, write zero, read as don’t care Some of these bits have functions in a 16550 compatible UART but are ignored here
+		unsigned reserved : 5;										// @1-5	 Reserved, write zero, read as donï¿½t care Some of these bits have functions in a 16550 compatible UART but are ignored here
 		unsigned BREAK : 1;											// @6	 If set high the UART1_TX line is pulled low continuously
 		unsigned DLAB : 1;											// @7	 DLAB access control bit.
 		unsigned reserved1 : 24;									// @8-31 Reserved - Write as 0, read as don't care 
@@ -319,7 +319,7 @@ typedef union
 {
 	struct __attribute__((__packed__))
 	{
-		unsigned reserved : 1;										// @0	 Reserved, write zero, read as don’t care 
+		unsigned reserved : 1;										// @0	 Reserved, write zero, read as donï¿½t care 
 		unsigned RTS : 1;											// @1	 If clear the UART1_RTS line is high, If set the UART1_RTS line is low 
 		unsigned reserved1 : 30;									// @2-31 Reserved - Write as 0, read as don't care 
 	};
@@ -335,7 +335,7 @@ typedef union
 	{
 		unsigned RXFDA : 1;											// @0	 This bit is set if the receive FIFO holds at least 1 
 		unsigned RXOE : 1;											// @1	 This bit is set if there was a receiver overrun
-		unsigned reserved : 3;										// @2-4	 Reserved, write zero, read as don’t care 
+		unsigned reserved : 3;										// @2-4	 Reserved, write zero, read as donï¿½t care 
 		unsigned TXFE : 1;											// @5	 This bit is set if the transmit FIFO can accept at least one byte
 		unsigned TXIdle : 1;										// @6	 This bit is set if the transmit FIFO is empty and the transmitter is idle. (Finished shifting out the last bit). 
 		unsigned reserved1 : 25;									// @7-31 Reserved - Write as 0, read as don't care 
@@ -350,7 +350,7 @@ typedef union
 {
 	struct __attribute__((__packed__))
 	{
-		unsigned reserved : 4;										// @0-3	 Reserved, write zero, read as don’t care 
+		unsigned reserved : 4;										// @0-3	 Reserved, write zero, read as donï¿½t care 
 		unsigned CTS : 1;											// @4	 This bit is the inverse of the CTS input, If set the UART1_CTS pin is low If clear the UART1_CTS pin is high 
 		unsigned reserved1 : 27;									// @5-31 Reserved - Write as 0, read as don't care 
 	};
@@ -2483,6 +2483,17 @@ HGDIOBJ SelectObject (HDC hdc,										// Handle to the DC (0 means use standar
 	return retVal;
 }
 
+/*==========================================================================}
+{								USB ROUTINES								}
+{==========================================================================*/
+
+bool UsbIrqSetup (void)
+{
+	bool resValue = false;
+	IRQ->EnableIRQs1 |= 1<<9;										// Enable the usb interrupt IRQ
+	resValue = true;												// Set success result
+	return resValue;												// Return result value	
+}
 
 
 
