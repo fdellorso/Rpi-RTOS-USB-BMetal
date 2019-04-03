@@ -6,6 +6,8 @@
 #include "task.h"
 #include "rpi-Irq.h"
 #include "semphr.h"
+#include "uspi.h"
+#include "rsta_bt/btsubsystem.h"
 
 
 void DoProgress(char label[], int step, int total, int x, int y, COLORREF col)
@@ -128,6 +130,100 @@ void task4 (void *pParam) {
 }
 
 
+xTaskHandle	xHandleBltProc = NULL;
+xQueueHandle xQueBltProc = NULL;
+// TaskStatus_t xTaskDetails;
+
+#define INQUIRY_SECONDS		20
+
+void prvTask_BluetoothInitialize(void *pParam) {
+	int i = 0;
+
+	/* Stop warnings. */
+	( void ) pParam;
+
+	TBTSubSystem *m_Bluetooth = (TBTSubSystem *) pvPortMalloc (sizeof(TBTSubSystem));
+	BTSubSystem(m_Bluetooth, 0, NULL);
+
+	// printf("\nBluetooth Initialize...\t\t     Started\n");
+	// printf("--------------------------------------------\n");
+
+	if(BTSubSystemInitialize(m_Bluetooth)) {
+		printf("Bluetooth Initialize...\t\t    Finished");
+	}
+
+	printf("Inquiry is running for %u seconds", INQUIRY_SECONDS);
+
+	// TBTInquiryResults *pInquiryResults = BTSubSystemInquiry(m_Bluetooth, INQUIRY_SECONDS);
+	// if (pInquiryResults == 0)
+	// {
+	// 	prvFunc_Print("Inquiry failed");
+	// }
+
+	// prvFunc_Print("Inquiry complete, %u device(s) found", BTInquiryResultsGetCount(pInquiryResults));
+
+	// if (BTInquiryResultsGetCount(pInquiryResults) > 0)
+	// {
+	// 	prvFunc_Print("# BD address        Class  Name");
+
+	// 	for (unsigned nDevice = 0; nDevice < BTInquiryResultsGetCount(pInquiryResults); nDevice++)
+	// 	{
+	// 		const u8 *pBDAddress = BTInquiryResultsGetBDAddress(pInquiryResults, nDevice);
+	// 		assert (pBDAddress != 0);
+			
+	// 		const u8 *pClassOfDevice = BTInquiryResultsGetClassOfDevice(pInquiryResults, nDevice);
+	// 		assert (pClassOfDevice != 0);
+			
+	// 		prvFunc_Print("%u %02X:%02X:%02X:%02X:%02X:%02X %02X%02X%02X %s",
+	// 				nDevice+1,
+	// 				(unsigned) pBDAddress[5],
+	// 				(unsigned) pBDAddress[4],
+	// 				(unsigned) pBDAddress[3],
+	// 				(unsigned) pBDAddress[2],
+	// 				(unsigned) pBDAddress[1],
+	// 				(unsigned) pBDAddress[0],
+	// 				(unsigned) pClassOfDevice[2],
+	// 				(unsigned) pClassOfDevice[1],
+	// 				(unsigned) pClassOfDevice[0],
+	// 				BTInquiryResultsGetRemoteName(pInquiryResults, nDevice));
+	// 	}
+	// }
+
+	// free(pInquiryResults);
+
+	while(1) {
+		i++;
+
+		vTaskDelay(100);
+	}
+}
+
+void prvTask_BluetoothProcess(void *pParam) {
+	int i = 0;
+
+	/* Stop warnings. */
+	( void ) pParam;
+	
+	TBTSubSystem *m_pBTSubSystem = NULL;
+
+	if(xQueueReceive(xQueBltProc, &m_pBTSubSystem, portMAX_DELAY) == pdPASS) {
+		vQueueDelete(xQueBltProc);
+		printf("%cSubSystem...\t\t\t    Received\n", 0x3e);
+	}
+
+	while(1) {
+		i++;
+
+		BTSubSystemProcess(m_pBTSubSystem);
+
+		// vTaskGetTaskInfo(xHandleBltProc, &xTaskDetails, pdTRUE, eInvalid);
+		// prvFunc_Print("BTPROC Stack: %d", xTaskDetails.usStackHighWaterMark);
+
+		taskYIELD();
+		// vTaskDelay(100);
+	}
+}
+
 void main (void)
 {
 	Init_EmbStdio(WriteText);										// Initialize embedded stdio
@@ -135,21 +231,42 @@ void main (void)
 	displaySmartStart(printf);										// Display smart start details
 	ARM_setmaxspeed(printf);										// ARM CPU to max speed
 	printf("Task tick rate: %u\n", configTICK_RATE_HZ);
-	/* Attempt to create a semaphore. */
-	vSemaphoreCreateBinary(barSemaphore);
 
-	if (barSemaphore != NULL)
-	{
+	USPiInitialize();
+
+	xQueBltProc = xQueueCreate(1, sizeof(TBTSubSystem *));
+
+	/* Attempt to create a semaphore. */
+	// vSemaphoreCreateBinary(barSemaphore);
+
+	// if (barSemaphore != NULL)
+	// {
 		/* The semaphore can now be used. Its handle is stored in the
 		xSemahore variable.  Calling xSemaphoreTake() on the semaphore here
 		will fail until the semaphore has first been given. */
-		xSemaphoreGive(barSemaphore);
+	// 	xSemaphoreGive(barSemaphore);
+	// }
+
+	// xTaskCreate(task1, "HARE  ", 2048, NULL, 4, NULL);
+	// xTaskCreate(task2, "TURTLE", 2048, NULL, 4, NULL);
+	// xTaskCreate(task3, "TIMER ", 2048, NULL, 3, NULL);
+	// xTaskCreate(task4, "DETAIL", 2048, NULL, 2, NULL);
+
+	if(xTaskCreate(prvTask_BluetoothInitialize, (const char *) "BluetoothInitialize",
+		4 * configMINIMAL_STACK_SIZE, NULL, 0, NULL) == pdPASS) {
+		// if(uxTaskPriorityGet(xHandleBltInit) < configMAX_CO_ROUTINE_PRIORITIES)
+		// {
+		// 	vTaskSuspend(xHandleBltInit);
+		// }
 	}
 
-	xTaskCreate(task1, "HARE  ", 2048, NULL, 4, NULL);
-	xTaskCreate(task2, "TURTLE", 2048, NULL, 4, NULL);
-	xTaskCreate(task3, "TIMER ", 2048, NULL, 3, NULL);
-	xTaskCreate(task4, "DETAIL", 2048, NULL, 2, NULL);
+	if(xTaskCreate(prvTask_BluetoothProcess, (const char *) "BluetoothProcess",
+		4 * configMINIMAL_STACK_SIZE, NULL, 1, &xHandleBltProc) == pdPASS) {
+		// if(uxTaskPriorityGet(xHandleBltProc) < configMAX_CO_ROUTINE_PRIORITIES)
+		{
+			vTaskSuspend(xHandleBltProc);
+		}
+	}
 
 	vTaskStartScheduler();
 	/*

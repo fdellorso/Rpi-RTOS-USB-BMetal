@@ -28,8 +28,10 @@
 // #include <circle/logger.h>
 #include <FreeRTOS.h>
 #include <task.h>
-#include <gpio.h>
-#include <uart0.h>
+
+#include "btuartdefinitions.h"
+#include "rpi-SmartStart.h"
+#include "rpi-Irq.h"
 
 enum TBTUARTRxState
 {
@@ -51,16 +53,16 @@ static unsigned s_nDeviceNumber = 1;
 
 void BTUARTTransportWrite (u8 nChar);
 void BTUARTTransportIRQHandler (TBTUARTTransport *pThis);
-static void BTUARTTransportIRQStub (int nIRQ, void *pParam);
+static void BTUARTTransportIRQStub (uint8_t nIRQ, void *pParam);
 
 void BTUARTTransport (TBTUARTTransport *pThis) //, CInterruptSystem *pInterruptSystem)
 {
 	// to be sure there is no collision with the UART GPIO interface
-	SetGpioFunction(14, GPIO_FUNC_INPUT);
-	SetGpioFunction(15, GPIO_FUNC_INPUT);
-	SetGpioFunction(32, GPIO_FUNC_ALT_3);
-	SetGpioFunction(33, GPIO_FUNC_ALT_3);
-	// pThis->m_pInterruptSystem (pInterruptSystem);		// TODO
+	gpio_setup(14, GPIO_INPUT);
+	gpio_setup(15, GPIO_INPUT);
+	gpio_setup(32, GPIO_ALTFUNC3);
+	gpio_setup(33, GPIO_ALTFUNC3);
+
 	pThis->m_bIRQConnected	= FALSE;
 	pThis->m_pEventHandler	= 0;
 	pThis->m_nRxState		= RxStateStart;
@@ -69,9 +71,8 @@ void BTUARTTransport (TBTUARTTransport *pThis) //, CInterruptSystem *pInterruptS
 void _BTUARTTransport (TBTUARTTransport *pThis)
 {
 	DataSyncBarrier ();
-	// write32 (ARM_UART0_IMSC, 0);
-	// write32 (ARM_UART0_CR, 0);
-	BTUARTClose();
+	PUT32 (ARM_UART0_IMSC, 0);
+	PUT32 (ARM_UART0_CR, 0);
 	DataMemBarrier ();
 
 	pThis->m_pEventHandler = 0;
@@ -79,10 +80,11 @@ void _BTUARTTransport (TBTUARTTransport *pThis)
 	if (pThis->m_bIRQConnected)
 	{
 		// assert (pThis->m_pInterruptSystem != 0);
-		// pThis->m_pInterruptSystem->DisconnectIRQ (ARM_IRQ_UART);	// TODO
-		taskENTER_CRITICAL();
-		DisableInterrupt(BCM2835_IRQ_ID_UART);
-		taskEXIT_CRITICAL();
+		// pThis->m_pInterruptSystem->DisconnectIRQ (ARM_IRQ_UART);
+		// TODO
+		// taskENTER_CRITICAL();
+		// DisableInterrupt(BCM2835_IRQ_ID_UART);
+		// taskEXIT_CRITICAL();
 	}
 
 	// pThis->m_pInterruptSystem = 0;
@@ -91,7 +93,8 @@ void _BTUARTTransport (TBTUARTTransport *pThis)
 boolean BTUARTTransportInitialize (TBTUARTTransport *pThis, unsigned nBaudrate)
 {
 	// unsigned nClockRate = CMachineInfo::Get ()->GetClockRate (CLOCK_ID_UART);
-	unsigned nClockRate = GetClockRate(0); // CLOCK_ID_UART)	// TODO
+	// TODO
+	unsigned nClockRate = 48000000; // CLOCK_ID_UART)
 	assert (nClockRate > 0);
 
 	if(nBaudrate == 0) nBaudrate = 115200;
@@ -105,29 +108,27 @@ boolean BTUARTTransportInitialize (TBTUARTTransport *pThis, unsigned nBaudrate)
 	assert (nFractDiv <= 0x3F);
 
 	// assert (pThis->m_pInterruptSystem != 0);
-	// pThis->m_pInterruptSystem->ConnectIRQ (ARM_IRQ_UART, IRQStub, this);			// TODO
-	taskENTER_CRITICAL();		// FIXME Possible to move after Init
-	RegisterInterrupt(BCM2835_IRQ_ID_UART, BTUARTTransportIRQStub, pThis);
-	EnableInterrupt(BCM2835_IRQ_ID_UART);
-	taskEXIT_CRITICAL();
+	// pThis->m_pInterruptSystem->ConnectIRQ (ARM_IRQ_UART, IRQStub, this);
+	// TODO
+	// taskENTER_CRITICAL();		// FIXME Possible to move after Init
+	// RegisterInterrupt(BCM2835_IRQ_ID_UART, BTUARTTransportIRQStub, pThis);
+	irqRegisterHandler(0, &BTUARTTransportIRQStub, NULL, pThis);		// Register the handler 
+	// EnableInterrupt(BCM2835_IRQ_ID_UART);
+	// taskEXIT_CRITICAL();
 	pThis->m_bIRQConnected = TRUE;
 
 	DataSyncBarrier ();
 
-	// write32 (ARM_UART0_IMSC, 0);
-	// write32 (ARM_UART0_ICR,  0x7FF);
-	// write32 (ARM_UART0_IBRD, nIntDiv);
-	// write32 (ARM_UART0_FBRD, nFractDiv);
-	// write32 (ARM_UART0_IFLS, IFLS_IFSEL_1_4 << IFLS_RXIFSEL_SHIFT);
-	// write32 (ARM_UART0_LCRH, LCRH_WLEN8_MASK | LCRH_FEN_MASK);		// 8N1
-	// write32 (ARM_UART0_CR,   CR_UART_EN_MASK | CR_TXE_MASK | CR_RXE_MASK);
-	// write32 (ARM_UART0_IMSC, INT_RX | INT_RT | INT_OE);
-
-	BTUARTInit(nIntDiv, nFractDiv);
+	PUT32 (ARM_UART0_IMSC, 0);
+	PUT32 (ARM_UART0_ICR,  0x7FF);
+	PUT32 (ARM_UART0_IBRD, nIntDiv);
+	PUT32 (ARM_UART0_FBRD, nFractDiv);
+	PUT32 (ARM_UART0_IFLS, IFLS_IFSEL_1_4 << IFLS_RXIFSEL_SHIFT);
+	PUT32 (ARM_UART0_LCRH, LCRH_WLEN8_MASK | LCRH_FEN_MASK);		// 8N1
+	PUT32 (ARM_UART0_CR,   CR_UART_EN_MASK | CR_TXE_MASK | CR_RXE_MASK);
+	PUT32 (ARM_UART0_IMSC, INT_RX | INT_RT | INT_OE);
 
 	DataMemBarrier ();
-
-	// CDeviceNameService::Get ()->AddDevice ("ttyBT1", this, FALSE);
 	
 	//DNS ADD
 	TString DeviceName;
@@ -170,36 +171,34 @@ void BTUARTTransportRegisterHCIEventHandler (TBTUARTTransport *pThis, TBTHCIEven
 
 void BTUARTTransportWrite (u8 nChar)
 {
-	// while (read32 (ARM_UART0_FR) & FR_TXFF_MASK)
-	// {
-	// 	// do nothing
-	// }
+	while (GET32 (ARM_UART0_FR) & FR_TXFF_MASK)
+	{
+		// do nothing
+	}
 		
-	// write32 (ARM_UART0_DR, nChar);
-
-	BTUARTWrite(nChar);
+	PUT32 (ARM_UART0_DR, nChar);
 }
 
 void BTUARTTransportIRQHandler (TBTUARTTransport *pThis)
 {
 	DataSyncBarrier ();
 
-	u32 nMIS = BTUARTReadReg (UART0_MIS);
+	u32 nMIS = GET32 (ARM_UART0_MIS);
 	if (nMIS & INT_OE)
 	{
 		LogWrite (FromBTUART, LOG_PANIC, "Overrun error");
 	}
 
-	BTUARTWriteReg (UART0_ICR, nMIS);
+	PUT32 (ARM_UART0_ICR, nMIS);
 
 	while (1)		// FIXME Warning Maybe necessary convert IRQ in Task
 	{
-		if (BTUARTReadReg (UART0_FR) & FR_RXFE_MASK)
+		if (GET32 (ARM_UART0_FR) & FR_RXFE_MASK)
 		{
 			break;
 		}
 
-		u8 nData = BTUARTReadReg (UART0_DR) & 0xFF;
+		u8 nData = GET32 (ARM_UART0_DR) & 0xFF;
 
 		switch (pThis->m_nRxState)
 		{
@@ -257,7 +256,7 @@ void BTUARTTransportIRQHandler (TBTUARTTransport *pThis)
 	DataMemBarrier ();
 }
 
-static void BTUARTTransportIRQStub (int nIRQ, void *pParam)
+static void BTUARTTransportIRQStub (uint8_t nIRQ, void *pParam)
 {
 	(void) nIRQ;		// FIXME Wunused
 

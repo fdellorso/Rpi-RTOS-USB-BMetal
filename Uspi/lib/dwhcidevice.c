@@ -721,8 +721,8 @@ boolean DWHCIDeviceTransferStage (TDWHCIDevice *pThis, TUSBRequest *pURB, boolea
 
 	while (pThis->m_bWaiting)
 	{
-		taskYIELD();
-
+		// taskYIELD();
+		portNOP();
 		// do nothing
 	}
 
@@ -1014,7 +1014,7 @@ void DWHCIDeviceChannelInterruptHandler (TDWHCIDevice *pThis, unsigned nChannel)
 
 			unsigned nInterval = USBEndpointGetInterval (USBRequestGetEndpoint (pURB));
 
-			StartKernelTimer (MSEC2HZ (nInterval), DWHCIDeviceTimerHandler, pThis, nChannel);
+			StartKernelTimer (MSEC2HZ (nInterval), (PendedFunction_t) DWHCIDeviceTimerHandler, pThis, nChannel);
 
 			break;
 		}
@@ -1128,7 +1128,7 @@ void DWHCIDeviceChannelInterruptHandler (TDWHCIDevice *pThis, unsigned nChannel)
 
 				unsigned nInterval = USBEndpointGetInterval (USBRequestGetEndpoint (pURB));
 
-				StartKernelTimer (MSEC2HZ (nInterval), DWHCIDeviceTimerHandler, pThis, nChannel);
+				StartKernelTimer (MSEC2HZ (nInterval), (PendedFunction_t) DWHCIDeviceTimerHandler, pThis, nChannel);
 			}
 			break;
 		}

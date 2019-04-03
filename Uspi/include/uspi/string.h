@@ -20,7 +20,9 @@
 #ifndef _uspi_string_h
 #define _uspi_string_h
 
-#include <uspi/stdarg.h>
+#include <stdarg.h>
+
+// #include <uspi/stdarg.h>
 #include <uspi/types.h>
 
 #ifdef __cplusplus

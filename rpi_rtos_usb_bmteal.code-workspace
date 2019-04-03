@@ -1,11 +1,14 @@
 {
 	"folders": [
 		{
-			"path": "/home/fra/Rpi-RTOS-USB-BMetal"
-		},
-		{
-			"path": "/home/fra/RaspberryPi-StuFA"
+			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"rpi-smartstart.h": "c",
+			"stdarg.h": "c",
+			"rpi-irq.h": "c"
+		}
+	}
 }

@@ -214,7 +214,7 @@ void BTHCILayerEventHandler (TBTHCILayer *pThis, const void *pBuffer, unsigned n
 	pThis->m_nEventFragmentOffset = 0;
 }
 
-void BTHCILayerEventStub (const void *pBuffer, unsigned nLength)
+static void BTHCILayerEventStub (const void *pBuffer, unsigned nLength)
 {
 	assert (s_pThisHCI != 0);
 	BTHCILayerEventHandler(s_pThisHCI, pBuffer, nLength);

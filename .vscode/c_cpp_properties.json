@@ -5,25 +5,24 @@
             "includePath": [
                 "${workspaceFolder}/Main",
                 "${workspaceFolder}/Loader/RaspberryPi",
-                "${workspaceFolder}/Uspi",
-                "${workspaceFolder}/Rsta_Bt",
+                "${workspaceFolder}/Uspi/include",
+                "${workspaceFolder}/Rsta_Bt/include",
                 "${workspaceFolder}/FreeRTOS/Source/include",
                 "${workspaceFolder}/FreeRTOS/Source/portable/GCC/RaspberryPi"
             ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    ""
+                ]
+            },
             "defines": [
                 "RASPPI=1"
             ],
-            "compilerPath": "${workspaceFolder}/../gcc-arm-none-eabi/bin/arm-none-eabi-gcc",
+            "compilerPath": "${workspaceFolder}/../gcc-arm-none-eabi-7-3-1/bin/arm-none-eabi-gcc",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "intelliSenseMode": "gcc-x64",
-            "browse": {
-                "path": [
-                    ""
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            }
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

@@ -28,13 +28,13 @@
 #include <task.h>
 #include <queue.h>
 
-#include <stufa_Task.h>
+#include "emb-stdio.h"
 
 extern xTaskHandle	xHandleBltProc;
 extern xQueueHandle	xQueBltProc;
 
-extern xTaskHandle	xHandleBltInit;
-extern TaskStatus_t xTaskDetails;
+// extern xTaskHandle	xHandleBltInit;
+// extern TaskStatus_t xTaskDetails;
 
 void BTSubSystem (TBTSubSystem *pThis, u32 nClassOfDevice, const char *pLocalName)
 {
@@ -84,14 +84,14 @@ boolean BTSubSystemInitialize (TBTSubSystem *pThis)
 	}
 
 	if(xQueueSend(xQueBltProc, &pThis, 0) == pdPASS) {
-		prvFunc_Print("%cSubSystem...\t\t\t      Sended", 0x3e);
+		printf("%cSubSystem...\t\t\t      Sended\n", 0x3e);
 		vTaskResume(xHandleBltProc);
 	}
 
 	while (!BTDeviceManagerDeviceIsRunning(BTHCILayerGetDeviceManager(pThis->m_pHCILayer)))
 	{
-		vTaskGetTaskInfo(xHandleBltInit, &xTaskDetails, pdTRUE, eInvalid);
-		prvFunc_Print("BTINIT Stack: %d", xTaskDetails.usStackHighWaterMark);
+		// vTaskGetTaskInfo(xHandleBltInit, &xTaskDetails, pdTRUE, eInvalid);
+		// printf("BTINIT Stack: %d\n", xTaskDetails.usStackHighWaterMark);
 
 		taskYIELD();
 	}

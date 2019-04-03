@@ -45,7 +45,7 @@ BUILD_DIR ?= ${TOP_DIR}/build
 CFLAGS  :=
 
 # Optimize for speed.
-CFLAGS += -O3
+CFLAGS += -Og
 
 # Enable most useful compiler warnings.
 CFLAGS  += -Wall
@@ -138,7 +138,7 @@ USPICOMPS := $(TOP_DIR)/Uspi
 BLTICOMPS := $(TOP_DIR)/Rsta_Bt
 
 # List of all components to include  ... Loader + FreeRTOS + USPi + Main
-COMPS := $(SYSCOMPS) $(RTOSCOMPS) $(USPICOMPS) $(MAINCOMPS)
+COMPS := $(SYSCOMPS) $(RTOSCOMPS) $(USPICOMPS) $(BLTICOMPS) $(MAINCOMPS)
 
 # Include component files, each should add its part to the compile source
 # This builds two lists C_FILES and S_FILES from iteration thru the makerules files

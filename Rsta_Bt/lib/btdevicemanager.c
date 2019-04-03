@@ -21,7 +21,7 @@
 #include <rsta_bt/bthcilayer.h>
 #include <rsta_bt/bcmvendor.h>
 
-#include <sys_timer.h>
+#include "rpi-SmartStart.h"
 
 #include <uspi/util.h>
 #include <uspi/assert.h>
@@ -121,7 +121,7 @@ void BTDeviceManagerProcess (TBTDeviceManager *pThis)
 						Cmd.ParameterTotalLength = PARM_TOTAL_LEN (Cmd);
 						BTHCILayerSendCommand(pThis->m_pHCILayer, &Cmd, sizeof Cmd);
 						// CScheduler::Get ()->MsSleep (50);
-						DelayMilliSysTimer(50);
+						timer_wait (50 * 1000);
 
 						pThis->m_nFirmwareOffset = 0;
 						pThis->m_State = BTDeviceStateWriteRAMPending;
@@ -158,7 +158,7 @@ void BTDeviceManagerProcess (TBTDeviceManager *pThis)
 					case OP_CODE_LAUNCH_RAM: {
 						assert (pThis->m_State == BTDeviceStateLaunchRAMPending);
 						// CScheduler::Get ()->MsSleep (250);
-						DelayMilliSysTimer(250);
+						timer_wait (250 * 1000);
 
 					NoFirmwareLoad:	;
 						TBTHCICommandHeader Cmd;

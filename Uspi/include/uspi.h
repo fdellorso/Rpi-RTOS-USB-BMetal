@@ -22,6 +22,8 @@
 #ifndef _uspi_h
 #define _uspi_h
 
+#include "uspi/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

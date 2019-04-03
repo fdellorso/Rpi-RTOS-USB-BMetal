@@ -24,7 +24,6 @@
 #include <rsta_bt/bttransportlayer.h>
 #include <rsta_bt/bluetooth.h>
 // #include <circle/interrupt.h>
-#include <interrupts.h>
 // #include <circle/gpiopin.h>
 #include <uspi/types.h>
 

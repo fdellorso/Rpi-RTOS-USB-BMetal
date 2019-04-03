@@ -22,7 +22,8 @@
 #ifndef _uspios_h
 #define _uspios_h
 
-#include <uspi/stdarg.h>
+#include <stdarg.h>
+// #include <uspi/stdarg.h>
 
 #include "emb-stdio.h"
 #include "rpi-SmartStart.h"
@@ -83,7 +84,7 @@ typedef void (*PendedFunction_t)( void *, uint32_t );
 unsigned StartKernelTimer (unsigned nDelay,				// in HZ units (see "system configuration" above)
 			   			   PendedFunction_t pHandler,
 			   			   void *pContext,
-						   unsigned int nChannel);				// handed over to the timer handler
+						   unsigned int nChannel);		// handed over to the timer handler
 
 void CancelKernelTimer (unsigned hTimer);
 

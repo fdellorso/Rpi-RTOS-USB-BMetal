@@ -48,6 +48,23 @@
 #define BUS_ADDRESS(phys)	(((phys) & ~0xC0000000) | GPU_MEM_BASE)
 
 //
+// UART0
+//
+#define ARM_UART0_BASE		(ARM_IO_BASE + 0x201000)
+
+#define ARM_UART0_DR		(ARM_UART0_BASE + 0x00)
+#define ARM_UART0_FR     	(ARM_UART0_BASE + 0x18)
+#define ARM_UART0_IBRD   	(ARM_UART0_BASE + 0x24)
+#define ARM_UART0_FBRD   	(ARM_UART0_BASE + 0x28)
+#define ARM_UART0_LCRH   	(ARM_UART0_BASE + 0x2C)
+#define ARM_UART0_CR     	(ARM_UART0_BASE + 0x30)
+#define ARM_UART0_IFLS   	(ARM_UART0_BASE + 0x34)
+#define ARM_UART0_IMSC   	(ARM_UART0_BASE + 0x38)
+#define ARM_UART0_RIS    	(ARM_UART0_BASE + 0x3C)
+#define ARM_UART0_MIS    	(ARM_UART0_BASE + 0x40)
+#define ARM_UART0_ICR    	(ARM_UART0_BASE + 0x44)
+
+//
 // USB Host Controller
 //
 #define ARM_USB_BASE		(ARM_IO_BASE + 0x980000)

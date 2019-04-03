@@ -21,7 +21,6 @@
 #define _rsta_bt_btsubsystem_h
 
 // #include <circle/interrupt.h>
-#include <interrupts.h>
 #include <rsta_bt/bluetooth.h>
 #include <rsta_bt/btinquiryresults.h>
 #include <rsta_bt/btuarttransport.h>

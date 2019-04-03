@@ -17,10 +17,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include <uspi/stdarg.h>
+#include <stdarg.h>
+// #include <uspi/stdarg.h>
+
 #include <uspi/string.h>
 #include <uspi/synchronize.h>
-#include <uspios.h>	
+#include <uspios.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -61,7 +63,7 @@ unsigned StartKernelTimer(unsigned nDelay, PendedFunction_t pHandler, void *pCon
 	(void)pContext;	// FIXME Wunused
 	(void)nChannel;	// FIXME Wunused
 
-	printf("StartKernelTimer");
+	printf("StartKernelTimer\n");
 
 	return 1;
 }
@@ -69,14 +71,14 @@ unsigned StartKernelTimer(unsigned nDelay, PendedFunction_t pHandler, void *pCon
 void CancelKernelTimer(unsigned hTimer) {
 	(void)hTimer;	// FIXME Wunused
 
-	printf("CancelKernelTimer");
+	printf("CancelKernelTimer\n");
 }
 
 void ConnectInterrupt(unsigned nIRQ, FN_INTERRUPT_HANDLER pfnHandler, void *pParam) {
 	(void) nIRQ;
 
 	DisableInterrupts();									// Make sure interrupts are off while we do irq registration
-	irqRegisterHandler(0, pfnHandler, NULL, NULL);			// Register the handler 
+	irqRegisterHandler(0, pfnHandler, NULL, pParam);		// Register the handler 
 	UsbIrqSetup();											// Enable Usb IRQ
 	EnableInterrupts();
 }
@@ -96,7 +98,7 @@ int SetPowerStateOn(unsigned nDeviceId) {
 
 	//spam mail until the response code is ok
 	while(mailbuffer[1] != 0x80000000){
-		mailbox_write(8, mailbuffer);
+		mailbox_write(8, (uint32_t) mailbuffer);
 		mailbox_read(8);
 	}
 
@@ -119,7 +121,7 @@ int GetMACAddress(unsigned char Buffer[6]) {
 
 	//spam mail until the response code is ok
 	while(mailbuffer[1] != 0x80000000){
-		mailbox_write(8, mailbuffer);
+		mailbox_write(8, (uint32_t) mailbuffer);
 		mailbox_read(8);
 	}
 
@@ -148,6 +150,7 @@ void LogWrite(const char *pSource, unsigned Severity, const char *pMessage, ...)
 	// LoggerWriteV (LoggerGet (), pSource, (TLogSeverity) Severity, pMessage, var);
 	// println(StringGet (&Message));
 	printf(StringGet (&Message));
+	printf("\n");
 
 	va_end (var);
 }
@@ -157,8 +160,10 @@ void LogWrite(const char *pSource, unsigned Severity, const char *pMessage, ...)
 void uspi_assertion_failed(const char *pExpr, const char *pFile, unsigned nLine) {
 	
 	printf(pExpr);
+	printf("\n");
 	printf(pFile);
-	printf("Line %x", nLine);
+	printf("\n");
+	printf("Line %x\n", nLine);
 
 	while(1){;} //system failure
 }
@@ -170,14 +175,13 @@ void DebugHexdump (const void *pBuffer, unsigned nBufLen, const char *pSource) {
 	(void)nBufLen;	// FIXME Wunused
 	(void)pSource;	// FIXME Wunused
 
-	printf("DebugHexdump");
+	printf("DebugHexdump\n");
 }
 
 #endif
 
 void* malloc(unsigned nSize) {
 	uspi_EnterCritical();
-	// TODO Check enter/exit_critical
 	void* temp = pvPortMalloc(nSize);
 	uspi_LeaveCritical();
 	return temp;
